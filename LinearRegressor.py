@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 
 class LinearRegressor:
 
-    def __init__(self, learning_rate, error_threshold):
+    def __init__(self, learning_rate, error_threshold, tolerance):
         self.learning_rate=learning_rate
         self.error_threshold = error_threshold
+        self.tolerance = tolerance
         self.m = 3
         self.c = 0
 
@@ -52,9 +53,9 @@ class LinearRegressor:
     def one_dim_gradient_descent(self,y,x):
         rmse = LinearRegressor._error(self, y=y, x=x, m=self.m, c=self.c)
         print(f"rmse: {rmse}")
-        #TODO change while loop statement so it terminates if there is not a signficant change between successive rmse
 
-        while np.abs(rmse)>self.error_threshold:
+        active_tolerance=0
+        while active_tolerance<self.tolerance:
             rmse = LinearRegressor._error(self,y=y,x=x,m=self.m,c=self.c)
             rmse_plus = LinearRegressor._error(self,y=y,x=x,m=self.m+self.learning_rate,c=self.c)
             rmse_minus= LinearRegressor._error(self,y=y,x=x,m=self.m-self.learning_rate,c=self.c)
@@ -73,6 +74,12 @@ class LinearRegressor:
 
             print(f"rmse: {LinearRegressor._error(self, y=y, x=x, m=self.m, c=self.c)}")
             LinearRegressor._plot_line(self, y=y, x=x)
+
+            if np.abs(min_rmse-rmse)<=self.error_threshold:
+                active_tolerance+=1
+            else:
+                active_tolerance=0
+
 
 
 
