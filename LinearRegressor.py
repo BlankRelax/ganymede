@@ -3,14 +3,15 @@ import  numpy as np
 import matplotlib.pyplot as plt
 
 
+
 class LinearRegressor:
 
     def __init__(self, learning_rate, error_threshold, tolerance):
         self.learning_rate=learning_rate
         self.error_threshold = error_threshold
         self.tolerance = tolerance
-        self.m_i = [2,4]
-        self.c = 0
+        self.m_i = []
+        self.c = 1
         self.y_hat=[]
 
 
@@ -61,8 +62,10 @@ class LinearRegressor:
         if y.shape[0]!=x.shape[0]:
             print("y and x are not of the same length")
         if len(x.shape)==1:
+            self.m_i = [1]
             LinearRegressor.one_dim_gradient_descent(self,y,x)
         else:
+            self.m_i = [1] * x.shape[1]
             LinearRegressor.multi_dim_gradient_descent(self,y,x)
             print(LinearRegressor.multi_dim_error(self,y,x))
 
@@ -110,8 +113,9 @@ class LinearRegressor:
             self.m_i[i] = self.m_i[i] - (self.learning_rate)*LinearRegressor.cost_function_derivative_m(self,y, x, i)
 
     def multi_dim_gradient_descent(self,y,x):
-        for i in range(10000):
+        for i in range(1000):
             LinearRegressor.update_weights(self,y,x)
+            print(f"{i} : {LinearRegressor.multi_dim_error(self,y,x)} ")
 
     def one_dim_gradient_descent(self,y,x):
 
