@@ -11,13 +11,14 @@ class data_generator:
 
         return y,x
 
-    def generate_multivariate_linear_data(self,number_of_variables,m:np.ndarray,c):
+    def generate_multivariate_linear_data(self,number_of_variables,m:np.ndarray,c, noise:bool=True):
 
         if number_of_variables != len(m):
             print('the number of variables is not equal to the number of weights provided')
             exit()
         x = []
         y = []
+
         for i in range(number_of_variables):
             # generate x
             x.append(np.random.rand(200,1))
@@ -25,9 +26,16 @@ class data_generator:
         # generate y
 
         for i in range(200):
-             y.append(np.dot(a=m, b=x[i,:].T)+c)
+            y.append(np.dot(a=m, b=x[i, :].T) + c)
+        y=np.array(y)
 
-        return np.array(y), x
+
+        if noise:
+            uniform_noise=np.random.uniform(low=0,high=2, size=200)
+            y=y+uniform_noise
+
+
+        return y, x
 
 
 

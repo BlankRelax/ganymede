@@ -6,13 +6,19 @@ import matplotlib.pyplot as plt
 
 class LinearRegressor:
 
-    def __init__(self, learning_rate, error_threshold, tolerance):
+    def __init__(self, learning_rate, error_threshold, tolerance, initial_weights):
         self.learning_rate=learning_rate
         self.error_threshold = error_threshold
         self.tolerance = tolerance
-        self.m_i = []
-        self.c = 1
         self.y_hat=[]
+        if initial_weights != None:
+            self.m_i=initial_weights[:-1]
+            self.c=initial_weights[-1]
+        else:
+            self.m_i=None
+            self.c = None
+
+
 
 
     def _error(self,y,x,m):
@@ -65,9 +71,11 @@ class LinearRegressor:
             self.m_i = [1]
             LinearRegressor.one_dim_gradient_descent(self,y,x)
         else:
-            self.m_i = [1] * x.shape[1]
+            if self.m_i == None:
+                self.m_i=[1]*x.shape[1]
+                self.c=1
             LinearRegressor.multi_dim_gradient_descent(self,y,x)
-            print(LinearRegressor.multi_dim_error(self,y,x))
+
 
 
 
@@ -113,9 +121,19 @@ class LinearRegressor:
             self.m_i[i] = self.m_i[i] - (self.learning_rate)*LinearRegressor.cost_function_derivative_m(self,y, x, i)
 
     def multi_dim_gradient_descent(self,y,x):
-        for i in range(1000):
+        active_tolerance=0
+        rmse_0=LinearRegressor.multi_dim_error(self,y,x)
+        print(f"{0}th iter rmse : {rmse_0} ")
+        iter=0
+        while active_tolerance<self.tolerance:
             LinearRegressor.update_weights(self,y,x)
-            print(f"{i} : {LinearRegressor.multi_dim_error(self,y,x)} ")
+            rmse_1=LinearRegressor.multi_dim_error(self,y,x)
+            print(f"{iter+1}th iter rmse : {rmse_1} ")
+            iter+=1
+
+            if np.abs(rmse_1-rmse_0)<=self.error_threshold:
+                active_tolerance+=1
+            rmse_0 = rmse_1
 
     def one_dim_gradient_descent(self,y,x):
 
