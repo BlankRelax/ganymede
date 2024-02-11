@@ -3,10 +3,13 @@ from data_generator import data_generator
 import numpy as np
 import matplotlib.pyplot as plt
 
-lr=LinearRegressor(learning_rate=0.25, error_threshold=0.0001,tolerance=10, initial_weights = [6,7,5,5,8,12] )
-y,x=data_generator().generate_multivariate_linear_data(number_of_variables=5, m=np.array([4,5,3,2,6]),c=5,noise=False)
+lr=LinearRegressor(learning_rate=0.25, error_threshold=0.0001,tolerance=10, initial_weights = [4,5,5] )
+y,x=data_generator().generate_multivariate_linear_data(number_of_variables=2, m=np.array([4,5]),c=5,noise=False)
 lr.fit(y=y, x=x)
-print(lr.m_i, lr.c)
+print(lr.m_i, lr.c,)
+y_true, x_test = data_generator().generate_multivariate_linear_data(number_of_variables=2, m=np.array([7,3]),c=5,noise=False)
+y_hat=lr.predict(x=x_test)
+print(sum(y_hat-y_true)/200)
 
 
 # def _plot_line(y, x,y_hat):

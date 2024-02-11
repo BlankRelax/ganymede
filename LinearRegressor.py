@@ -1,24 +1,24 @@
 # code for linear regressor
 import  numpy as np
 import matplotlib.pyplot as plt
+from base.base import base_regressor
 
 
 
-class LinearRegressor:
+class LinearRegressor(base_regressor):
 
     def __init__(self, learning_rate, error_threshold, tolerance, initial_weights):
         self.learning_rate=learning_rate
         self.error_threshold = error_threshold
         self.tolerance = tolerance
         self.y_hat=[]
+        self._is_fitted: bool =False
         if initial_weights != None:
             self.m_i=initial_weights[:-1]
             self.c=initial_weights[-1]
         else:
             self.m_i=None
             self.c = None
-
-
 
 
     def _error(self,y,x,m):
@@ -59,14 +59,12 @@ class LinearRegressor:
         self.N = len(y) # number of observations
 
         if type(y)!=np.ndarray:
-            print('y should be a numpy.ndarray')
-            exit()
+            raise TypeError('y is not a numpy array')
         if type(x)!=np.ndarray:
-            print('x should be a numpy.ndarray')
-            exit()
+            raise TypeError('x is not a numpy array')
 
         if y.shape[0]!=x.shape[0]:
-            print("y and x are not of the same length")
+            raise ValueError('y does not have the same number of rows and x')
         if len(x.shape)==1:
             self.m_i = [1]
             LinearRegressor.one_dim_gradient_descent(self,y,x)
@@ -75,6 +73,25 @@ class LinearRegressor:
                 self.m_i=[1]*x.shape[1]
                 self.c=1
             LinearRegressor.multi_dim_gradient_descent(self,y,x)
+        self._is_fitted=True
+
+    def predict(self,x:np.ndarray)->np.ndarray:
+        y=[]
+
+        if not self._is_fitted:
+            raise PermissionError('you have cannot do this as you have not fit the regressor')
+        if x.shape[1]!=len(self.m_i):
+            raise ValueError('x has the wrong number of dimensions')
+
+        for row_index in range(x.shape[0]):
+            y.append(np.dot(a=self.m_i,b=x[row_index,:].T))
+
+        return np.array(y)
+
+
+
+
+
 
 
 
