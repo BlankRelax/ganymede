@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 from base.base import base_regressor
 from typing import Literal
 
-
+"""
+Formalism adopted from https://www.stat.cmu.edu/~cshalizi/mreg/15/lectures/13/lecture-13.pdf
+"""
 
 class LinearRegressor(base_regressor):
 
@@ -23,14 +25,14 @@ class LinearRegressor(base_regressor):
         # matrices
         self.beta = np.array((weights,)).T
 
-    def multi_dim_error(self,y,x,func:Literal['MSE']):
+    def multi_dim_error(self,y,x,func:Literal['MSE','RMSE']):
 
         if func=='MSE':
             e_beta = y - np.matmul(x,self.beta)
             error = (1/self.N) * np.matmul(e_beta.T,e_beta)
         elif func=='RMSE':
-            e_beta = y - np.matmul(x1=x, x2=self.beta)
-            error = np.sqrt(x= (1 / self.N) * np.matmul(x1=e_beta.T, x2=e_beta))
+            e_beta = y - np.matmul(x, self.beta)
+            error = np.sqrt((1 / self.N) * np.matmul(e_beta.T,e_beta))
 
         return error
 
@@ -52,7 +54,9 @@ class LinearRegressor(base_regressor):
 
         #LinearRegressor.multi_dim_gradient_descent(self,y,x)
         self._is_fitted=True
-        return LinearRegressor.multi_dim_error(self,y=y,x=x,func='MSE')
+
+        LinearRegressor.multi_dim_gradient_descent(self,y,x)
+
 
     def predict(self,x:np.ndarray)->np.ndarray:
         y=[]
@@ -78,46 +82,28 @@ class LinearRegressor(base_regressor):
         plt.clf()
 
 
-    def cost_function_derivative_bias(self, y, x):
+    def cost_function_derivative(self,y,x):
 
-        outer_sum=0
-        for n in range(self.N):
-            inner_sum=0
-            for i in range(x.shape[1]):
-                inner_sum += self.m_i[i]*x[n,i]
-            outer_sum +=inner_sum+self.c-y[n]
-
-        return (1/self.N)*outer_sum
-
-
-
-    def cost_function_derivative_m(self, y, x, i):
-        product1=LinearRegressor.cost_function_derivative_bias(self,y,x)
-        product2 = np.sum(x[:,i])
-
-        return (1/self.N)*product2*product1
+        return (2 / self.N) * (np.matmul(np.matmul(x.T,x),self.beta) - np.matmul(x.T,y))
 
     def update_weights(self, y, x):
-        bias_derivative = LinearRegressor.cost_function_derivative_bias(self,y, x)
-        new_c = self.c - (self.learning_rate) * bias_derivative
-        self.c = new_c
-        for i in range(len(self.m_i)):
-            self.m_i[i] = self.m_i[i] - (self.learning_rate)*LinearRegressor.cost_function_derivative_m(self,y, x, i)
-
+        new_weights = self.beta - self.learning_rate *LinearRegressor.cost_function_derivative(self,y,x)
+        self.beta=new_weights
     def multi_dim_gradient_descent(self,y,x):
         active_tolerance=0
-        rmse_0=LinearRegressor.multi_dim_error(self,y,x)
-        print(f"{0}th iter rmse : {rmse_0} ")
+        error_0=LinearRegressor.multi_dim_error(self,y,x,'RMSE')
+        print(f"{0}th iter rmse : {error_0} ")
         iter=0
         while active_tolerance<self.tolerance:
             LinearRegressor.update_weights(self,y,x)
-            rmse_1=LinearRegressor.multi_dim_error(self,y,x)
-            print(f"{iter+1}th iter rmse : {rmse_1} ")
+            error_1=LinearRegressor.multi_dim_error(self,y,x,'RMSE')
+            print(f"{iter+1}th iter rmse : {error_1} ")
             iter+=1
 
-            if np.abs(rmse_1-rmse_0)<=self.error_threshold:
+            if np.abs(error_1-error_0)<=self.error_threshold:
                 active_tolerance+=1
-            rmse_0 = rmse_1
+            error_0 = error_1
+
 
 
 
