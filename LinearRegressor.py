@@ -2,52 +2,37 @@
 import  numpy as np
 import matplotlib.pyplot as plt
 from base.base import base_regressor
+from typing import Literal
 
 
 
 class LinearRegressor(base_regressor):
 
-    def __init__(self, learning_rate, error_threshold, tolerance, initial_weights):
+    def __init__(self, learning_rate, error_threshold, tolerance, weights:list):
+
+        # hyper-parameters
         self.learning_rate=learning_rate
         self.error_threshold = error_threshold
         self.tolerance = tolerance
+
+        # properties
+        self._is_fitted: bool = False
+
         self.y_hat=[]
-        self._is_fitted: bool =False
-        if initial_weights != None:
-            self.m_i=initial_weights[:-1]
-            self.c=initial_weights[-1]
-        else:
-            self.m_i=None
-            self.c = None
 
+        # matrices
+        self.beta = np.array((weights,)).T
 
-    def _error(self,y,x,m):
-        squared_errors = []
-        y_hat = []
+    def multi_dim_error(self,y,x,func:Literal['MSE']):
 
-        for i in range(len(y)):
-            y_hat.append((m*x[i])+self.c)
-            squared_errors.append(np.square((y[i]-y_hat[i])))
+        if func=='MSE':
+            e_beta = y - np.matmul(x,self.beta)
+            error = (1/self.N) * np.matmul(e_beta.T,e_beta)
+        elif func=='RMSE':
+            e_beta = y - np.matmul(x1=x, x2=self.beta)
+            error = np.sqrt(x= (1 / self.N) * np.matmul(x1=e_beta.T, x2=e_beta))
 
-        rmse= np.sqrt(np.sum(squared_errors)/(2*len(y)))
-
-        self.y_hat=y_hat
-        return rmse
-
-    def multi_dim_error(self,y,x):
-        squared_errors = []
-        y_hat = []
-
-        for n in range(self.N):
-            inner_sum=0
-            for i in range(len(self.m_i)):
-                inner_sum+=self.m_i[i]*x[n,i]+self.c
-            y_hat.append(inner_sum)
-            squared_errors.append(np.square((y[n]-y_hat[n])))
-
-        rmse = np.sqrt(np.sum(squared_errors) / (2*self.N))
-        self.y_hat=y_hat
-        return rmse
+        return error
 
     def fit(self, y,x):
 
@@ -62,15 +47,12 @@ class LinearRegressor(base_regressor):
 
         if y.shape[0]!=x.shape[0]:
             raise ValueError('y does not have the same number of rows and x')
-        if len(x.shape)==1:
-            self.m_i = [1]
-            LinearRegressor.one_dim_gradient_descent(self,y,x)
-        else:
-            if self.m_i == None:
-                self.m_i=[1]*x.shape[1]
-                self.c=1
-            LinearRegressor.multi_dim_gradient_descent(self,y,x)
+
+        x = np.insert(arr=x, obj=0, values=np.ones(shape=(self.N,)), axis=1)
+
+        #LinearRegressor.multi_dim_gradient_descent(self,y,x)
         self._is_fitted=True
+        return LinearRegressor.multi_dim_error(self,y=y,x=x,func='MSE')
 
     def predict(self,x:np.ndarray)->np.ndarray:
         y=[]
@@ -95,8 +77,7 @@ class LinearRegressor(base_regressor):
         plt.show()
         plt.clf()
 
-    def calculate_sum_row(self, x):
-        return np.sum(x, 0)
+
     def cost_function_derivative_bias(self, y, x):
 
         outer_sum=0
@@ -138,36 +119,7 @@ class LinearRegressor(base_regressor):
                 active_tolerance+=1
             rmse_0 = rmse_1
 
-    def one_dim_gradient_descent(self,y,x):
 
-        m=self.m_i[0]
-        active_tolerance=0
-        while active_tolerance<self.tolerance:
-            rmse = LinearRegressor._error(self,y=y,x=x,m=m)
-            rmse_plus = LinearRegressor._error(self,y=y,x=x,m=m+self.learning_rate)
-            rmse_minus= LinearRegressor._error(self,y=y,x=x,m=m-self.learning_rate)
-
-            rmse_spectrum = {'rmse':rmse, 'rmse_plus':rmse_plus, 'rmse_minus':rmse_minus}
-
-            min_rmse=min(list(rmse_spectrum.values()))
-            direction_arg = list(rmse_spectrum.values()).index(min_rmse)
-            direction = list(rmse_spectrum.keys())[direction_arg]
-
-
-            if direction=='rmse_plus':
-                m = m+self.learning_rate
-            elif direction=='rmse_minus':
-                m=m-self.learning_rate
-
-            self.m_i[0]=m
-
-            print(f"rmse: {LinearRegressor._error(self, y=y, x=x, m=m)}")
-            LinearRegressor._plot_line(self, y=y, x=x)
-
-            if np.abs(min_rmse-rmse)<=self.error_threshold:
-                active_tolerance+=1
-            else:
-                active_tolerance=0
 
 
 
