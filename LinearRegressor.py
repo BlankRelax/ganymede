@@ -45,12 +45,9 @@ class LinearRegressor(base_regressor):
             y_hat.append(inner_sum)
             squared_errors.append(np.square((y[n]-y_hat[n])))
 
-        rmse = np.sqrt(np.sum(squared_errors) / (2 * self.N))
+        rmse = np.sqrt(np.sum(squared_errors) / (2*self.N))
         self.y_hat=y_hat
         return rmse
-
-
-
 
     def fit(self, y,x):
 
@@ -88,14 +85,6 @@ class LinearRegressor(base_regressor):
 
         return np.array(y)
 
-
-
-
-
-
-
-
-
     def _plot_line(self,y,x):
         plt.scatter(x,y,c='r', label='true data')
         plt.plot(x,self.y_hat, c='c',label='regression model')
@@ -126,9 +115,6 @@ class LinearRegressor(base_regressor):
         product2 = np.sum(x[:,i])
 
         return (1/self.N)*product2*product1
-
-
-
 
     def update_weights(self, y, x):
         bias_derivative = LinearRegressor.cost_function_derivative_bias(self,y, x)
