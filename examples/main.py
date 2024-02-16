@@ -27,7 +27,7 @@ for n in range(len(y)):
     inner_sum = 0
     for i in range(1):
         inner_sum += lr.m_i[i] * x[n, i] + lr.c
-    y_hat.append(inner_sum)
+        y_hat.append(inner_sum)
 
 _plot_line(y=y,x=x,y_hat=y_hat)
 
