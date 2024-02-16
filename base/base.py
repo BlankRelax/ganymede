@@ -6,7 +6,7 @@ class base_regressor(ABC):
         return self._is_fitted
 
     @abstractmethod
-    def fit(self, y, x) -> None:
+    def fit(self, y, x,optimizer) -> None:
         ...
 
 

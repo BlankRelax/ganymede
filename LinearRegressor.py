@@ -37,7 +37,7 @@ class LinearRegressor(base_regressor):
 
         return error[0, 0]
 
-    def fit(self, y, x):
+    def fit(self, y, x, optimizer:Literal['SGD','whole']='whole'):
 
         # method current supports 1-D Linear regression fit
 
@@ -53,8 +53,11 @@ class LinearRegressor(base_regressor):
 
         x = np.insert(arr=x, obj=0, values=np.ones(shape=(self.N,)), axis=1)
         y = np.reshape(y, (len(y), 1))
+        if optimizer=='whole':
+            LinearRegressor.multi_dim_gradient_descent(self, y, x)
+        elif optimizer=='SGD':
+            LinearRegressor.stochastic_gradient_descent(self, y, x)
 
-        LinearRegressor.multi_dim_gradient_descent(self, y, x)
         self._is_fitted = True
 
     def predict(self, y: np.ndarray, x: np.ndarray) -> np.ndarray:
@@ -101,3 +104,25 @@ class LinearRegressor(base_regressor):
             if np.abs(error_1 - error_0) <= self.error_threshold:
                 active_tolerance += 1
             error_0 = error_1
+
+    def stochastic_gradient_descent(self, y, x, batch_size:int=1 ):
+        active_tolerance = 0
+        error_0 = LinearRegressor.multi_dim_error(self, y, x, 'RMSE')
+        print(f"{0}th iter rmse : {error_0} ")
+        iter = 0
+
+
+        random_obs_index = np.random.randint(low=0, high=self.N,size=batch_size)
+        y_batch = y[random_obs_index]
+        x_batch= x[random_obs_index,:]
+
+        while active_tolerance < self.tolerance:
+            LinearRegressor.update_weights(self, y_batch, x_batch)
+            error_1 = LinearRegressor.multi_dim_error(self, y, x, 'RMSE')
+            print(f"{iter + 1}th iter rmse : {error_1} ")
+            iter += 1
+
+            if np.abs(error_1 - error_0) <= self.error_threshold:
+                active_tolerance += 1
+            error_0 = error_1
+
