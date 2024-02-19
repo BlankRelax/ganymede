@@ -1,8 +1,4 @@
-
-from LinearRegressor import LinearRegressor
-
-
-
+from MachineLearning import LinearRegressor
 
 def test_initialise():
     lr=LinearRegressor(learning_rate=0.1,

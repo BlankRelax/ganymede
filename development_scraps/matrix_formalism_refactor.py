@@ -1,6 +1,6 @@
 import numpy as np
 from data_generator import data_generator
-from LinearRegressor import LinearRegressor
+from MachineLearning import LinearRegressor
 
 y,x=data_generator().generate_multivariate_linear_data(number_of_variables=3,m=np.array([5,4,6]),c=5,
                                                        length=10000, noise=False)

@@ -1,4 +1,4 @@
-from LinearRegressor import LinearRegressor
+from MachineLearning.LinearRegressor import LinearRegressor
 from data_generator import data_generator
 import numpy as np
 import matplotlib.pyplot as plt
