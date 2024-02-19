@@ -30,10 +30,10 @@ class LinearRegressor(base_regressor):
 
         if func == 'MSE':
             e_beta = y - np.matmul(x, self.beta)
-            error = (1 / self.N) * np.matmul(e_beta.T, e_beta)
+            error = (1 / len(y)) * np.matmul(e_beta.T, e_beta)
         elif func == 'RMSE':
             e_beta = y - np.matmul(x, self.beta)
-            error = np.sqrt((1 / self.N) * np.matmul(e_beta.T, e_beta))
+            error = np.sqrt((1 / len(y)) * np.matmul(e_beta.T, e_beta))
 
         return error[0, 0]
 
@@ -83,7 +83,7 @@ class LinearRegressor(base_regressor):
         plt.clf()
 
     def cost_function_derivative(self, y, x):
-        c_prime = (2 / self.N) * (np.matmul(np.matmul(x.T, x), self.beta) - np.matmul(x.T, y))
+        c_prime = (2 / len(y)) * (np.matmul(np.matmul(x.T, x), self.beta) - np.matmul(x.T, y))
         return c_prime
 
     def update_weights(self, y, x):
