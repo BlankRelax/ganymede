@@ -11,6 +11,11 @@ Formalism adopted from https://www.stat.cmu.edu/~cshalizi/mreg/15/lectures/13/le
 
 class LinearRegressor(base_regressor):
 
+    """
+    LinearRegressor allows you to "fit" multidimensional data by performing gradient-decent to train weights
+    You can then predict on test data using 'predict' method
+    """
+
     def __init__(self, learning_rate, error_threshold, tolerance, weights: list):
 
         # hyper-parameters
@@ -39,7 +44,12 @@ class LinearRegressor(base_regressor):
 
     def fit(self, y, x, optimizer:Literal['SGD','whole']='whole'):
 
-        # method current supports 1-D Linear regression fit
+        """
+        :param y: is a numpy column vector of nx1
+        :param x: is a numpy matrix (array) with dimensions nxm where each column represents observations of a variable
+        :param optimizer: decides whether you wish to perform gradient descent on all the rows or just one
+
+        """
 
         self.N = len(y)  # number of observations
 
@@ -61,6 +71,13 @@ class LinearRegressor(base_regressor):
         self._is_fitted = True
 
     def predict(self, y: np.ndarray, x: np.ndarray) -> np.ndarray:
+
+        """
+
+        :param y: true labels of observations
+        :param x: test data with same number of columns as train data
+        :return: y_pred, predictions and rmse, performance score
+        """
 
         if not self._is_fitted:
             raise PermissionError('you cannot do this as you have not fit the regressor')
