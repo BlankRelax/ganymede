@@ -14,9 +14,18 @@ class LinearRegressor(base_regressor):
     """
     LinearRegressor allows you to "fit" multidimensional data by performing gradient-decent to train weights
     You can then predict on test data using 'predict' method
+
     """
 
     def __init__(self, learning_rate, error_threshold, tolerance, weights: list):
+
+        """
+
+        :param learning_rate: multiplier to gradient of cost function when performing gradient descent
+        :param error_threshold: absolute difference between previous steps of gradient descent before termination
+        :param tolerance: number of steps taken before termination of gradient descent when error threshold is met
+        :param weights: initial list of weights, should be the same length of the number of variables in train data
+        """
 
         # hyper-parameters
         self.learning_rate = learning_rate
